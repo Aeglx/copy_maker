@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文案生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        /* 自定义样式以确保兼容性和美观 */
+        .container {
+            background-color: #fff;
+            padding: 2.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 90%;
+            transition: transform 0.3s ease;
+        }
+        .container:hover {
+            transform: translateY(-5px);
+        }
+        input, textarea {
+            border: 2px solid #e2e8f0;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus {
+            border-color: #4f46e5;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        #generateBtn {
+            padding: 1rem 1.5rem;
+            background: linear-gradient(to right, #4f46e5, #8b5cf6);
+            color: white;
+            font-weight: bold;
+            border: none;
+            border-radius: 0.75rem;
+            font-size: 1.125rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.4);
+        }
+        #generateBtn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.6);
+        }
+        #generateBtn:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .result-box {
+            background-color: #f3f4f6;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            line-height: 1.8;
+            min-height: 150px;
+            color: #374151;
+            border: 1px solid #e5e7eb;
+        }
+        .text-gradient {
+            background-image: linear-gradient(to right, #4f46e5, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center p-5">
+
+<div class="container w-full mx-auto">
+    <h1 class="text-4xl font-extrabold text-center mb-8 text-gradient">微信保险文案生成器</h1>
+
+    <div class="mb-6">
+        <label for="productName" class="block text-gray-700 font-semibold mb-2 text-lg">产品名称：</label>
+        <input type="text" id="productName" class="w-full" placeholder="例如：平安尊享版">
+    </div>
+
+    <div class="mb-6">
+        <label for="productSlogan" class="block text-gray-700 font-semibold mb-2 text-lg">产品标语（可选）：</label>
+        <input type="text" id="productSlogan" class="w-full" placeholder="例如：高性价比之选！">
+    </div>
+    
+    <div class="mb-6">
+        <label for="points" class="block text-gray-700 font-semibold mb-2 text-lg">核心保障要点：</label>
+        <textarea id="points" class="w-full" rows="5" placeholder="请每行输入一个要点，例如：&#10;意外身故/伤残：10万&#10;意外伤害医疗：3万&#10;重大疾病保险金：5万"></textarea>
+    </div>
+
+    <button type="button" id="generateBtn" class="w-full mt-6">生成文案</button>
+
+    <div class="result-box mt-8" id="resultBox">
+        生成的文案将显示在这里。
+    </div>
+</div>
+
+<script>
+    document.getElementById('generateBtn').addEventListener('click', async function() {
+        const productName = document.getElementById('productName').value;
+        const productSlogan = document.getElementById('productSlogan').value;
+        const pointsText = document.getElementById('points').value;
+
+        // 将文本框中的内容按换行符分割成数组，并过滤空行
+        const points = pointsText.split('\n').map(p => p.trim()).filter(p => p !== '');
+
+        if (!productName || points.length === 0) {
+            document.getElementById('resultBox').innerText = '产品名称和至少一个要点是必填的！';
+            return;
+        }
+
+        const generateBtn = document.getElementById('generateBtn');
+        const resultBox = document.getElementById('resultBox');
+        
+        generateBtn.disabled = true; // 禁用按钮防止重复点击
+        resultBox.innerText = '正在生成随机文案样式...'; // 模拟加载状态
+
+        try {
+            const randomStyle = await fetchRandomStyle();
+            const generatedText = generateStyledText(productName, productSlogan, points, randomStyle);
+            resultBox.innerText = generatedText;
+        } catch (error) {
+            resultBox.innerText = '文案生成失败，请稍后再试。';
+            console.error('文案生成错误:', error);
+        } finally {
+            generateBtn.disabled = false; // 恢复按钮
+        }
+    });
+
+    /**
+     * 从预定义的列表中随机选择一个表情符号
+     * @param {Array<string>} list - 表情符号列表
+     * @returns {string} - 单个表情符号字符串
+     */
+    function getRandomItemFromList(list) {
+        return list[Math.floor(Math.random() * list.length)];
+    }
+
+    /**
+     * 动态生成一个随机的超大颜文字图案
+     * @returns {string} - 随机颜文字字符串
+     */
+    function generateLargeKaomoji() {
+        // 定义多种颜文字的“零部件”
+        const topArms = ['(ง ˙ω˙)ว', 'ヽ(ﾟ∀ﾟ)ﾉ', 'ヾ(≧▽≦*)o', 'ヾ(•ω•`)o', '(´ε｀ )♡'];
+        const middleEyes = ['(o^^o)', '(≧∀≦)', '(oﾟvﾟ)ノ', '（人*´ω’）', 'ヾ(^ω^*)'];
+        const bottomArms = ['ヘ(￣ω￣ヘ)', 'ヘ(￣ω￣ヘ)', 'o(〃^▽^〃)o', 'つ🧧と'];
+        
+        const randomTop = getRandomItemFromList(topArms);
+        const randomMiddle = getRandomItemFromList(middleEyes);
+        const randomBottom = getRandomItemFromList(bottomArms);
+
+        // 随机组合三种颜文字结构
+        const structures = [
+            `\n${randomTop}\n  ${randomMiddle}\n${randomBottom}\n`,
+            `\n${randomMiddle}\n${randomBottom}\n`,
+            `\n(づ￣ ³￣)づ\n ${randomTop}\n`
+        ];
+
+        return getRandomItemFromList(structures);
+    }
+
+    /**
+     * 模拟网络请求，从“云端”获取随机文案样式
+     * 这里通过一个Promise和setTimeout来模拟异步请求
+     * @returns {Promise<object>} - 随机样式对象
+     */
+    function fetchRandomStyle() {
+        return new Promise(resolve => {
+            const styleTypes = ['list', 'promotional'];
+            const randomStyleType = getRandomItemFromList(styleTypes);
+
+            let randomStyle = { type: randomStyleType };
+
+            if (randomStyleType === 'list') {
+                const titlePrefixes = ['✨ ', '👑 ', '💎 ', '🌟 ', '🌈 ', '💡 ', '🚀 ', '🎉 ', '🛡️ ', '❤️ ', '✅ ', '💯 '];
+                const listPrefixes = ['👉 ', '✅ ', '✔️ ', '➡️ ', '🔹 ', '🎯 ', '💖 ', '✨ ', '👍 ', '🚀 '];
+                const sloganPrefixes = ['💰 ', '💖 ', '🔥 ', '🚀 ', '💯 ', '🎁 ', '💪 ', '💡 '];
+                
+                randomStyle.titlePrefix = getRandomItemFromList(titlePrefixes);
+                randomStyle.listPrefix = getRandomItemFromList(listPrefixes);
+                randomStyle.sloganPrefix = getRandomItemFromList(sloganPrefixes);
+            } else if (randomStyleType === 'promotional') {
+                const titleEmojis = ['✨', '🔥', '🌟', '💎', '💖'];
+                const pointEmojis = ['🤩', '💛', '☕️', '👍', '🎉', '🎁'];
+                const ctaPhrases = ['领 券', '限 时', '立 购', '速 抢'];
+                const ctaDecorations = ['(๑･ω･๑)', '(╯✧∇✧)╯', 'ヾ(•ω•`)o', '(σﾟ∀ﾟ)σ', 'ヽ(ﾟ∀ﾟ)ﾒ(ﾟ∀ﾟ)ﾉ'];
+                const ctaLineEndings = [' 开瑞', ' 冲鸭', ' 上新', ' 福利'];
+                const dividers = ['￣￣￣￣ つ', '〰〰〰〰 👉', '━━━━━━ 🎁'];
+                const dividerEmojis = ['🧧', '🛍️', '💰', '🎟️', '🛒'];
+                const callToActionLines = ['冲本周福利👉', '戳这里领券 👉', '速抢优惠👉', '不容错过👉'];
+
+                randomStyle.titleEmoji = getRandomItemFromList(titleEmojis);
+                randomStyle.pointEmojis = Array.from({length: 3}, () => getRandomItemFromList(pointEmojis));
+                randomStyle.ctaText = getRandomItemFromList(ctaPhrases) + ' ' + getRandomItemFromList(ctaDecorations) + getRandomItemFromList(ctaLineEndings);
+                randomStyle.ctaDividerTop = getRandomItemFromList(dividers) + getRandomItemFromList(dividerEmojis);
+                randomStyle.ctaDividerBottom = 'と ￣￣￣￣';
+                randomStyle.callToActionLine = getRandomItemFromList(callToActionLines);
+            }
+            
+            // 模拟网络延迟
+            setTimeout(() => {
+                resolve(randomStyle);
+            }, 500); // 延迟0.5秒
+        });
+    }
+
+    /**
+     * 根据输入内容和随机样式生成文案
+     * @param {string} productName - 产品名称
+     * @param {string} slogan - 产品标语
+     * @param {string[]} points - 核心保障要点数组
+     * @param {object} style - 随机样式对象
+     * @returns {string} - 格式化后的文案
+     */
+    function generateStyledText(productName, slogan, points, style) {
+        let textBody = '';
+        if (style.type === 'list') {
+            let result = `${style.titlePrefix}【${productName}】\n`;
+            if (slogan) {
+                result += `${style.sloganPrefix}${slogan}\n\n`;
+            } else {
+                result += `\n`;
+            }
+            result += '🛡️ **核心保障：**\n';
+            points.forEach(point => {
+                result += `${style.listPrefix}${point}\n`;
+            });
+            textBody = result;
+        } else if (style.type === 'promotional') {
+            const p1 = points[0] || '';
+            const p2 = points[1] || '';
+            const p3 = points[2] || '';
+            let result = `
+﹝新品秒杀﹞
+
+${productName}
+${slogan} ${style.titleEmoji}
+
+${style.pointEmojis[0]} ${p1}
+${style.pointEmojis[1]} ${p2}
+${style.pointEmojis[2]} ${p3}
+
+\\ ${style.ctaText} \\
+${style.ctaDividerTop} ${style.ctaDividerBottom}
+${style.callToActionLine}
+`;
+            textBody = result.trim();
+        }
+
+        const largeKaomoji = generateLargeKaomoji();
+        return textBody + '\n\n' + largeKaomoji;
+    }
+</script>
+
+</body>
+</html>
