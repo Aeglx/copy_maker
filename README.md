@@ -1,11 +1,47 @@
-# Copy Maker
+# 微信文案生成器
 
-A simple web application for copying and formatting text.
+专业的微信营销文案生成工具，一键生成吸引人的产品宣传文案。
 
-## Features
-- Copy text with various formatting options
-- Easy to use interface
-- Lightweight implementation
+## 功能特性
 
-## Usage
-Open index.html in your browser to use the application.
+✨ 多种文案风格随机生成  
+🎨 精美的颜文字装饰  
+📋 支持产品名称、标语和要点输入  
+📋 一键复制生成的文案  
+
+## 使用说明
+
+1. 填写产品名称（必填）
+2. 输入产品标语（可选）
+3. 列出核心保障要点（每行一个）
+4. 点击"生成文案"按钮
+5. 点击"复制"按钮复制生成的文案
+
+## 技术栈
+
+- HTML5 & CSS3
+- JavaScript (ES6)
+- Tailwind CSS
+- Font Awesome 图标
+
+## 安装与运行
+
+无需安装，直接打开`index.html`文件即可使用。
+
+## 示例
+
+```
+✨ 【平安尊享版】
+💰 高性价比之选！
+
+🛡️ 核心保障：
+✅ 意外身故/伤残：10万
+✅ 意外伤害医疗：3万
+✅ 重大疾病保险金：5万
+
+(ﾉ◕ヮ◕)ﾉ*:･ﾟ✧
+```
+
+## 许可证
+
+MIT License
